@@ -1,0 +1,21 @@
+---
+
+##proc-mounts##56.207.249.240:/infra/nfs3/sa_teams /devroot/sa/teams nfs rw,nosuid,nodev,relatime,vers=3,rsize=32768,wsize=32768,namlen=255,soft,proto=tcp,timeo=600,retrans=2,sec=sys,mountaddr=56.207.249.240,mountvers=3,mountport=43769,mountproto=udp,local_lock=none,addr=56.207.249.240
+
+ 
+
+  - name: Get the IP Address for the /sa/teams mount source
+    shell: "grep '/infra/nfs3/sa_teams' /etc/fstab"
+    register: "sa_teams"
+
+  - debug:
+      msg: "{{sa_teams | regex_search('/(?:[0-9]{1,3}\\.){3}[0-9]{1,3}/m')}}"
+
+  - set_fact:
+      address: |
+        {{sa_teams.stdout |
+          map('regex_findall','/(?:[0-9]{1,3}\\.){3}[0-9]{1,3}/m') |
+          map('join') | list }}
+
+  - debug:
+      msg: "{{address}}"
